@@ -10,6 +10,8 @@ public class Shooter : MonoBehaviour
     
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private float projectileSpeed = 10f;
+    [SerializeField] private float enemyProjectileSpeed = 3f;
+
     [SerializeField] private float projectileLifetime = 5f;
     
     [SerializeField] private float baseFiringRate = .2f;
@@ -23,6 +25,13 @@ public class Shooter : MonoBehaviour
 
     
     private Coroutine _fireCoroutine;
+
+    private AudioPlayer _audioPlayer;
+
+    void Awake()
+    {
+        _audioPlayer = FindObjectOfType<AudioPlayer>();
+    }
     
     void Start()
     {
@@ -63,7 +72,7 @@ public class Shooter : MonoBehaviour
             Rigidbody2D rb = instance.GetComponent<Rigidbody2D>();
             if (rb != null)
             {
-                rb.velocity = transform.up * projectileLifetime;
+                rb.velocity = transform.up * projectileLifetime * enemyProjectileSpeed;
             }
 
             Destroy(instance , projectileLifetime);
@@ -72,6 +81,8 @@ public class Shooter : MonoBehaviour
                 baseFiringRate + firingRateVariance);
 
             timeToNextProjectile = Mathf.Clamp(timeToNextProjectile, minFiringRate, float.MaxValue);
+            
+            _audioPlayer.PlayShootingClip();
             yield return new WaitForSeconds(timeToNextProjectile);
         }
     }
